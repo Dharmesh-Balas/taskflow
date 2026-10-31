@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 class EditTaskScreen extends StatefulWidget {
   final String currentTitle;
+  final String currentCategory;
 
   const EditTaskScreen({
     super.key,
     required this.currentTitle,
+    required this.currentCategory,
   });
 
   @override
@@ -15,12 +17,23 @@ class EditTaskScreen extends StatefulWidget {
 class _EditTaskScreenState extends State<EditTaskScreen> {
   late final TextEditingController _titleController;
 
+  final List<String> _categories = [
+    'Personal',
+    'Work',
+    'Study',
+  ];
+
+  late String _selectedCategory;
+
   @override
   void initState() {
     super.initState();
+
     _titleController = TextEditingController(
       text: widget.currentTitle,
     );
+
+    _selectedCategory = widget.currentCategory;
   }
 
   @override
@@ -41,7 +54,10 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
       return;
     }
 
-    Navigator.pop(context, title);
+    Navigator.pop(context, {
+      'title': title,
+      'category': _selectedCategory,
+    });
   }
 
   @override
@@ -66,7 +82,33 @@ class _EditTaskScreenState extends State<EditTaskScreen> {
                 prefixIcon: Icon(Icons.edit),
               ),
             ),
+
             const SizedBox(height: 16),
+
+            DropdownButtonFormField<String>(
+              value: _selectedCategory,
+              decoration: const InputDecoration(
+                labelText: 'Category',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.category_outlined),
+              ),
+              items: _categories.map((category) {
+                return DropdownMenuItem(
+                  value: category,
+                  child: Text(category),
+                );
+              }).toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    _selectedCategory = value;
+                  });
+                }
+              },
+            ),
+
+            const SizedBox(height: 16),
+
             FilledButton.icon(
               onPressed: _updateTask,
               icon: const Icon(Icons.save),

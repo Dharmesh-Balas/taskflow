@@ -10,6 +10,10 @@ class AddTaskScreen extends StatefulWidget {
 class _AddTaskScreenState extends State<AddTaskScreen> {
   final TextEditingController _titleController = TextEditingController();
 
+  String _selectedCategory = 'Personal';
+
+  final List<String> _categories = ['Personal', 'Work', 'Study'];
+
   @override
   void dispose() {
     _titleController.dispose();
@@ -21,22 +25,18 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
 
     if (title.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a task title'),
-        ),
+        const SnackBar(content: Text('Please enter a task title')),
       );
       return;
     }
 
-    Navigator.pop(context, title);
+    Navigator.pop(context, {'title': title, 'category': _selectedCategory});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add New Task'),
-      ),
+      appBar: AppBar(title: const Text('Add New Task')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -54,7 +54,30 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 prefixIcon: Icon(Icons.task_alt),
               ),
             ),
+
             const SizedBox(height: 16),
+
+            DropdownButtonFormField<String>(
+              initialValue: _selectedCategory,
+              decoration: const InputDecoration(
+                labelText: 'Category',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.category),
+              ),
+              items: _categories.map((category) {
+                return DropdownMenuItem(value: category, child: Text(category));
+              }).toList(),
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    _selectedCategory = value;
+                  });
+                }
+              },
+            ),
+
+            const SizedBox(height: 16),
+
             FilledButton.icon(
               onPressed: _addTask,
               icon: const Icon(Icons.add),

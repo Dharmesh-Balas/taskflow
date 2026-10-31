@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class TaskCard extends StatelessWidget {
   final String title;
   final String subtitle;
+  final String category;
   final IconData icon;
   final bool isCompleted;
   final VoidCallback onToggle;
@@ -13,6 +14,7 @@ class TaskCard extends StatelessWidget {
     super.key,
     required this.title,
     required this.subtitle,
+    required this.category,
     required this.icon,
     required this.isCompleted,
     required this.onToggle,
@@ -26,10 +28,7 @@ class TaskCard extends StatelessWidget {
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: Colors.indigo.shade50,
-          child: Icon(
-            icon,
-            color: Colors.indigo,
-          ),
+          child: Icon(icon, color: Colors.indigo),
         ),
         title: Text(
           title,
@@ -40,14 +39,25 @@ class TaskCard extends StatelessWidget {
                 : TextDecoration.none,
           ),
         ),
-        subtitle: Text(subtitle),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(subtitle),
+            const SizedBox(height: 4),
+            Text(
+              category,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Colors.indigo,
+              ),
+            ),
+          ],
+        ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Checkbox(
-              value: isCompleted,
-              onChanged: (_) => onToggle(),
-            ),
+            Checkbox(value: isCompleted, onChanged: (_) => onToggle()),
             IconButton(
               onPressed: onEdit,
               icon: const Icon(Icons.edit_outlined),
