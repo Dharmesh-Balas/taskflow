@@ -37,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
           return {
             'title': task['title'],
             'subtitle': task['subtitle'],
+            'category': task['category'] ?? 'Personal',
             'icon': _getIcon(task['icon']),
             'isCompleted': task['isCompleted'],
           };
@@ -48,18 +49,21 @@ class _HomeScreenState extends State<HomeScreen> {
           {
             'title': 'Learn Flutter',
             'subtitle': 'Practice widgets',
+            'category': 'Study',
             'icon': Icons.code,
             'isCompleted': false,
           },
           {
             'title': 'Build TaskFlow UI',
             'subtitle': 'Create home screen',
+            'category': 'Work',
             'icon': Icons.design_services,
             'isCompleted': false,
           },
           {
             'title': 'Push to GitHub',
             'subtitle': 'Save today’s progress',
+            'category': 'Work',
             'icon': Icons.cloud_upload,
             'isCompleted': false,
           },
@@ -77,6 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return {
         'title': task['title'],
         'subtitle': task['subtitle'],
+        'category': task['category'],
         'icon': _getIconName(task['icon']),
         'isCompleted': task['isCompleted'],
       };
@@ -111,16 +116,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _addTask() async {
-    final title = await Navigator.push<String>(
+    final result = await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(builder: (context) => const AddTaskScreen()),
     );
 
-    if (title != null && title.isNotEmpty) {
+    if (result != null) {
       setState(() {
         _tasks.add({
-          'title': title,
+          'title': result['title'],
           'subtitle': 'New task',
+          'category': result['category'],
           'icon': Icons.task_alt,
           'isCompleted': false,
         });
@@ -131,17 +137,20 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _editTask(int index) async {
-    final updatedTitle = await Navigator.push<String>(
+    final result = await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            EditTaskScreen(currentTitle: _tasks[index]['title']),
+        builder: (context) => EditTaskScreen(
+          currentTitle: _tasks[index]['title'],
+          currentCategory: _tasks[index]['category'],
+        ),
       ),
     );
 
-    if (updatedTitle != null && updatedTitle.isNotEmpty) {
+    if (result != null) {
       setState(() {
-        _tasks[index]['title'] = updatedTitle;
+        _tasks[index]['title'] = result['title'];
+        _tasks[index]['category'] = result['category'];
       });
 
       await _saveTasks();
@@ -165,6 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     await _saveTasks();
     if (!mounted) return;
+
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text('$deletedTask deleted')));
@@ -218,6 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         return TaskCard(
                           title: task['title'],
                           subtitle: task['subtitle'],
+                          category: task['category'],
                           icon: task['icon'],
                           isCompleted: task['isCompleted'],
                           onToggle: () => _toggleTask(index),
